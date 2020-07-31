@@ -1,6 +1,7 @@
 #include <iostream>
-#include "src/Constants.h"
+#include "Constants.h"
 #include "Game.h"
+#include "../lib/glm/glm.hpp"
 
 Game::Game()
 {
@@ -17,10 +18,8 @@ bool Game::IsRunning() const
     return this->isRunning;
 }
 
-float projectilePosX = 0.0f;
-float projectilePosY = 0.0f;
-float projectileVelX = 0.5f;
-float projectileVelY = 0.5f;
+glm::vec2 projectilePos = glm::vec2(0.0f, 0.0f);
+glm::vec2 projectileVel = glm::vec2(20.0f, 20.0f);
 
 void Game::Initialize(int width, int height)
 {
@@ -75,19 +74,45 @@ void Game::ProcessInput()
 
 void Game::Update()
 {
-    projectilePosX += projectileVelX;
-    projectilePosY += projectileVelY;
+    // Wait until 16ms has ellapsed since the last frame
+    // while(!SDL_TICKS_PASSED(SDL_GetTicks(), ticksLastFrame + FRAME_TARGET_TIME)); ---> Replcaced by SDL_Delay below
+
+    // Sleep the execution until we reach the target frame time in milliseconds
+    int timeToWait = FRAME_TARGET_TIME - (SDL_GetTicks() - ticksLastFrame);
+
+    // Only call delay if we are too fast too process this frame
+    if (timeToWait > 0 && timeToWait <= FRAME_TARGET_TIME)
+        SDL_Delay(timeToWait);
+
+    // Delta time is the difference in ticks from last frame converted to seconds
+    float deltaTime = (SDL_GetTicks() - ticksLastFrame) / 1000.0f;
+
+    // Clamp deltaTime to a maximum value
+    deltaTime = (deltaTime > 0.05f) ? 0.05f : deltaTime;
+
+    // Sets the new ticks for current frame to be used in the next pass
+    ticksLastFrame = SDL_GetTicks();
+
+    // Use deltaTime to update my game objects
+    projectilePos = glm::vec2(
+        projectilePos.x + projectileVel.x * deltaTime,
+        projectilePos.y + projectileVel.y * deltaTime
+    );
 }
 
 void Game::Render()
 {
+    // Set the background color
     SDL_SetRenderDrawColor(renderer, 21, 21, 21, 255);
+
+    // Clear the back buffer
     SDL_RenderClear(renderer);
 
+    // Draw all game objects of the scene
     SDL_Rect projectile
     {
-        (int)projectilePosX,
-        (int)projectilePosY,
+        (int)projectilePos.x,
+        (int)projectilePos.y,
         10,
         10
     };
@@ -95,6 +120,7 @@ void Game::Render()
     SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
     SDL_RenderFillRect(renderer, &projectile);
 
+    // Swap front and back buffers
     SDL_RenderPresent(renderer);
 }
 
