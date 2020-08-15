@@ -10,13 +10,14 @@ class Game
     private:
         bool isRunning;
         SDL_Window *window;
-        SDL_Renderer *renderer;
         int ticksLastFrame = 0;
 
     public:
         Game();
         ~Game();
+        static SDL_Renderer *renderer;
         bool IsRunning() const;
+        void LoadLevel(int levelNumber);
         void Initialize(int width, int height);
         void ProcessInput();
         void Update();

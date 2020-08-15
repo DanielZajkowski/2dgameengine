@@ -1,7 +1,13 @@
 #include <iostream>
 #include "Constants.h"
 #include "Game.h"
+#include "EntityManager.h"
+#include "./Components/TransformComponent.h"
 #include "../lib/glm/glm.hpp"
+
+
+EntityManager manager;
+SDL_Renderer* Game::renderer;
 
 Game::Game()
 {
@@ -17,9 +23,6 @@ bool Game::IsRunning() const
 {
     return this->isRunning;
 }
-
-glm::vec2 projectilePos = glm::vec2(0.0f, 0.0f);
-glm::vec2 projectileVel = glm::vec2(20.0f, 20.0f);
 
 void Game::Initialize(int width, int height)
 {
@@ -43,8 +46,20 @@ void Game::Initialize(int width, int height)
         return;
     }
 
+    LoadLevel(0);
+
     isRunning = true;
     return;
+}
+
+void Game::LoadLevel(int levelNumber)
+{
+    // add entities and add components to the entities
+    Entity& newEntityA(manager.AddEntity("projectileA"));
+    newEntityA.AddComponent<TransformComponent>(0, 0, 20, 20, 32, 32, 1);
+
+    Entity &newEntityB(manager.AddEntity("projectileB"));
+    newEntityB.AddComponent<TransformComponent>(255, 255, -20, 30, 16, 16, 2);
 }
 
 void Game::ProcessInput()
@@ -93,32 +108,20 @@ void Game::Update()
     // Sets the new ticks for current frame to be used in the next pass
     ticksLastFrame = SDL_GetTicks();
 
-    // Use deltaTime to update my game objects
-    projectilePos = glm::vec2(
-        projectilePos.x + projectileVel.x * deltaTime,
-        projectilePos.y + projectileVel.y * deltaTime
-    );
+    // Here we call the manger.update to update all entities as function of deltaTIme
+    manager.Update(deltaTime);
 }
 
 void Game::Render()
 {
     // Set the background color
     SDL_SetRenderDrawColor(renderer, 21, 21, 21, 255);
-
-    // Clear the back buffer
     SDL_RenderClear(renderer);
 
-    // Draw all game objects of the scene
-    SDL_Rect projectile
-    {
-        (int)projectilePos.x,
-        (int)projectilePos.y,
-        10,
-        10
-    };
-
-    SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
-    SDL_RenderFillRect(renderer, &projectile);
+    // Here we call the manager.render to render all entities
+    if(manager.HasNoEntities())
+        return;
+    manager.Render();
 
     // Swap front and back buffers
     SDL_RenderPresent(renderer);
