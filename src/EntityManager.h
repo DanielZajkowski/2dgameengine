@@ -3,6 +3,7 @@
 
 #include "./Entity.h"
 #include "./Component.h"
+#include <iostream>
 #include <vector>
 
 class EntityManager
@@ -17,6 +18,8 @@ class EntityManager
         Entity& AddEntity(std::string entityName);
         std::vector<Entity*> GetEntities() const;
         unsigned int GetEntityCount();
+        
+        void ListAllEntities() const;
 };
 
 #endif
