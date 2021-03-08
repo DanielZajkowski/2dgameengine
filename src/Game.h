@@ -19,6 +19,7 @@ class Game
         ~Game();
         static SDL_Renderer *renderer;
         static AssetManager *assetManager;
+        static SDL_Event event;
         bool IsRunning() const;
         void LoadLevel(int levelNumber);
         void Initialize(int width, int height);
