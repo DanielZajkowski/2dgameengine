@@ -4,8 +4,9 @@
 #include <vector>
 #include <string>
 #include <map>
-#include "./EntityManager.h"
-#include "./Component.h"
+#include "EntityManager.h"
+#include "Component.h"
+#include "Constants.h"
 
 class Component;
 class EntityManager;
@@ -15,18 +16,18 @@ class Entity
     private:
         EntityManager& manager;
         bool isActive;
+        std::vector<Component*> components;
         std::map<const std::type_info*, Component*> componentTypeMap;
 
     public:
         std::string name;
-        std::vector<Component*> components;
-        Entity(EntityManager& manager);
-        Entity(EntityManager&, std::string name);
+        LayerType layer;
+        Entity(EntityManager &manager);
+        Entity(EntityManager &manager, std::string name, LayerType layer);
         void Update(float deltaTime);
         void Render();
         void Destroy();
         bool IsActive() const;
-
         void ListAllComponents() const;
 
         template <typename T, typename... TArgs>
