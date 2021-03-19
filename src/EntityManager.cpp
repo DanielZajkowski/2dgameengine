@@ -27,7 +27,7 @@ void EntityManager::Update(float deltaTime)
 
 void EntityManager::Render()
 {
-    for(int layerNumber = 0; layerNumber < NUM_LAYER; layerNumber++)
+    for(int layerNumber = 0; layerNumber < NUM_LAYERS; layerNumber++)
     {
         for(auto& entity: GetEntitiesByLayer(static_cast<LayerType>(layerNumber)))
         {
@@ -79,13 +79,15 @@ void EntityManager::ListAllEntities() const
 
 CollisionType EntityManager::CheckCollisions() const
 {
-    for (auto &thisEntity : entities)
+    for (int i = 0; i < entities.size() - 1; i++)
     {
+        auto &thisEntity = entities[i];
         if (thisEntity->HasComponent<ColliderComponent>())
         {
             ColliderComponent *thisCollider = thisEntity->GetComponent<ColliderComponent>();
-            for (auto &thatEntity : entities)
+            for (int j = i + 1; j < entities.size(); j++)
             {
+                auto &thatEntity = entities[j];
                 if (thisEntity->name.compare(thatEntity->name) != 0 && thatEntity->HasComponent<ColliderComponent>())
                 {
                     ColliderComponent *thatCollider = thatEntity->GetComponent<ColliderComponent>();

@@ -8,6 +8,7 @@
 #include "./Components/SpriteComponent.h"
 #include "./Components/KeyboardControlComponent.h"
 #include "./Components/ColliderComponent.h"
+#include "./Components/TextLabelComponent.h"
 #include "../lib/glm/glm.hpp"
 
 EntityManager manager;
@@ -37,6 +38,12 @@ void Game::Initialize(int width, int height)
     if(SDL_Init(SDL_INIT_EVERYTHING) != 0)
     {
         std::cerr << "Error initializing SDL." << std::endl;
+        return;
+    }
+
+    if(TTF_Init() != 0)
+    {
+        std::cerr << "Error initializing SDL TTF." << std::endl;
         return;
     }
 
@@ -94,6 +101,9 @@ void Game::LoadLevel(int levelNumber)
     Entity &radarEntity(manager.AddEntity("radar", UI_LAYER));
     radarEntity.AddComponent<TransformComponent>(720, 15, 0, 0, 64, 64, 1);
     radarEntity.AddComponent<SpriteComponent>("radar-image", 8, 150, false, true);
+
+    Entity& labelLevelName(manager.AddEntity("LabelLevelName", UI_LAYER));
+    labelLevelName.AddComponent<TextLabelComponent>(10, 10, "First Level...", "charriot-font", WHITE_COLOR);
 }
 
 void Game::ProcessInput()
