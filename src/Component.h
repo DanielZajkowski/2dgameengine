@@ -8,7 +8,6 @@ class Entity;
 class Component
 {
     public:
-        std::string componentName;
         Entity *owner;
         virtual ~Component() {}
         virtual void Initialize() {}

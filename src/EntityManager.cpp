@@ -12,11 +12,6 @@ void EntityManager::ClearData()
     }
 }
 
-bool EntityManager::HasNoEntities()
-{
-    return entities.size() == 0;
-}
-
 void EntityManager::Update(float deltaTime)
 {
     for (auto &entity : entities)
@@ -27,33 +22,36 @@ void EntityManager::Update(float deltaTime)
 
 void EntityManager::Render()
 {
-    for(int layerNumber = 0; layerNumber < NUM_LAYERS; layerNumber++)
+    for (int layerNumber = 0; layerNumber < NUM_LAYERS; layerNumber++)
     {
-        for(auto& entity: GetEntitiesByLayer(static_cast<LayerType>(layerNumber)))
+        for (auto &entity : GetEntitiesByLayer(static_cast<LayerType>(layerNumber)))
         {
             entity->Render();
         }
     }
 }
 
-Entity &EntityManager::AddEntity(std::string entityName, LayerType layer)
+bool EntityManager::HasNoEntities() const
 {
-    Entity *entity = new Entity(*this, entityName, layer);
-    entities.emplace_back(entity);
-    return *entity;
+    return entities.size() == 0;
 }
 
-std::vector<Entity*> EntityManager::GetEntities() const
+unsigned int EntityManager::GetEntityCount() const
+{
+    return entities.size();
+}
+
+std::vector<Entity *> EntityManager::GetEntities() const
 {
     return entities;
 }
 
-std::vector<Entity*> EntityManager::GetEntitiesByLayer(LayerType layer) const
+std::vector<Entity *> EntityManager::GetEntitiesByLayer(LayerType layer) const
 {
-    std::vector<Entity*> selectedEntities;
-    for(auto& entity: entities)
+    std::vector<Entity *> selectedEntities;
+    for (auto &entity : entities)
     {
-        if(entity->layer == layer)
+        if (entity->layer == layer)
         {
             selectedEntities.emplace_back(entity);
         }
@@ -61,17 +59,12 @@ std::vector<Entity*> EntityManager::GetEntitiesByLayer(LayerType layer) const
     return selectedEntities;
 }
 
-unsigned int EntityManager::GetEntityCount()
-{
-    return entities.size();
-}
-
 void EntityManager::ListAllEntities() const
 {
     unsigned int i = 0;
-    for(auto& entity: entities)
+    for (auto &entity : entities)
     {
-        std::cout << "Entity [" << i << "]: " << entity->name << std::endl;
+        std::cout << "Entity[" << i << "]: " << entity->name << std::endl;
         entity->ListAllComponents();
         i++;
     }
@@ -115,4 +108,11 @@ CollisionType EntityManager::CheckCollisions() const
         }
     }
     return NO_COLLISION;
+}
+
+Entity &EntityManager::AddEntity(std::string entityName, LayerType layer)
+{
+    Entity *entity = new Entity(*this, entityName, layer);
+    entities.emplace_back(entity);
+    return *entity;
 }

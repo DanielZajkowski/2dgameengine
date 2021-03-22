@@ -5,7 +5,7 @@ Animation::Animation()
 
 }
 
-Animation::Animation(unsigned int index, unsigned int numFrames, unsigned int animationSpeed)
+Animation::Animation(int index, int numFrames, int animationSpeed)
 {
     this->index = index;
     this->numFrames = numFrames;

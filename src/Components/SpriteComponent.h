@@ -10,8 +10,8 @@
 class SpriteComponent: public Component
 {
     private:
-        TransformComponent* transform;
-        SDL_Texture* texture;
+        TransformComponent *transform;
+        SDL_Texture *texture;
         SDL_Rect sourceRectangle;
         SDL_Rect destinationRectangle;
         bool isAnimated;
@@ -27,8 +27,15 @@ class SpriteComponent: public Component
 
         SpriteComponent(std::string assetTextureId)
         {
-            isAnimated = false;
-            isFixed = false;
+            this->isAnimated = false;
+            this->isFixed = false;
+            SetTexture(assetTextureId);
+        }
+
+        SpriteComponent(std::string assetTextureId, bool isFixed)
+        {
+            this->isAnimated = false;
+            this->isFixed = isFixed;
             SetTexture(assetTextureId);
         }
 
@@ -39,18 +46,16 @@ class SpriteComponent: public Component
             this->animationSpeed = animationSpeed;
             this->isFixed = isFixed;
 
-            if(hasDirections)
+            if (hasDirections)
             {
                 Animation downAnimation = Animation(0, numFrames, animationSpeed);
                 Animation rightAnimation = Animation(1, numFrames, animationSpeed);
                 Animation leftAnimation = Animation(2, numFrames, animationSpeed);
                 Animation upAnimation = Animation(3, numFrames, animationSpeed);
-
                 animations.emplace("DownAnimation", downAnimation);
                 animations.emplace("RightAnimation", rightAnimation);
                 animations.emplace("LeftAnimation", leftAnimation);
                 animations.emplace("UpAnimation", upAnimation);
-
                 this->animationIndex = 0;
                 this->currentAnimationName = "DownAnimation";
             }
@@ -61,7 +66,7 @@ class SpriteComponent: public Component
                 this->animationIndex = 0;
                 this->currentAnimationName = "SingleAnimation";
             }
-            
+
             Play(this->currentAnimationName);
 
             SetTexture(id);
@@ -91,7 +96,7 @@ class SpriteComponent: public Component
 
         void Update(float deltaTime) override
         {
-            if(isAnimated)
+            if (isAnimated)
             {
                 sourceRectangle.x = sourceRectangle.w * static_cast<int>((SDL_GetTicks() / animationSpeed) % numFrames);
             }

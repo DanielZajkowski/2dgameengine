@@ -35,27 +35,30 @@ bool Game::IsRunning() const
 
 void Game::Initialize(int width, int height)
 {
-    if(SDL_Init(SDL_INIT_EVERYTHING) != 0)
+    if (SDL_Init(SDL_INIT_EVERYTHING) != 0)
     {
         std::cerr << "Error initializing SDL." << std::endl;
         return;
     }
-
-    if(TTF_Init() != 0)
+    if (TTF_Init() != 0)
     {
-        std::cerr << "Error initializing SDL TTF." << std::endl;
+        std::cerr << "Error initializing SDL TTF" << std::endl;
         return;
     }
-
-    window = SDL_CreateWindow(NULL, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, SDL_WINDOW_BORDERLESS);
-    if(!window)
+    window = SDL_CreateWindow(
+        NULL,
+        SDL_WINDOWPOS_CENTERED,
+        SDL_WINDOWPOS_CENTERED,
+        width,
+        height,
+        SDL_WINDOW_BORDERLESS);
+    if (!window)
     {
         std::cerr << "Error creating SDL window." << std::endl;
         return;
     }
-
     renderer = SDL_CreateRenderer(window, -1, 0);
-    if(!renderer)
+    if (!renderer)
     {
         std::cerr << "Error creating SDL renderer." << std::endl;
         return;
@@ -111,22 +114,22 @@ void Game::ProcessInput()
     SDL_PollEvent(&event);
     switch (event.type)
     {
-        case SDL_QUIT:
+    case SDL_QUIT:
+    {
+        isRunning = false;
+        break;
+    }
+    case SDL_KEYDOWN:
+    {
+        if (event.key.keysym.sym == SDLK_ESCAPE)
         {
             isRunning = false;
-            return;
         }
-        case SDL_KEYDOWN:
-        {
-            if(event.key.keysym.sym == SDLK_ESCAPE)
-            {
-                isRunning = false;
-            }
-        }
-        default:
-        {
-            break;
-        }
+    }
+    default:
+    {
+        break;
+    }
     }
 }
 
@@ -158,9 +161,26 @@ void Game::Update()
     CheckCollisions();
 }
 
+void Game::Render()
+{
+    // Set the background color
+    SDL_SetRenderDrawColor(renderer, 21, 21, 21, 255);
+    SDL_RenderClear(renderer);
+
+    // Here we call the manager.render to render all entities
+    if (manager.HasNoEntities())
+    {
+        return;
+    }
+    manager.Render();
+
+    // Swap front and back buffers
+    SDL_RenderPresent(renderer);
+}
+
 void Game::HandleCameraMovement()
 {
-    TransformComponent* mainPlayerTransform = player.GetComponent<TransformComponent>();
+    TransformComponent *mainPlayerTransform = player.GetComponent<TransformComponent>();
 
     camera.x = mainPlayerTransform->position.x - (WINDOW_WIDTH / 2);
     camera.y = mainPlayerTransform->position.y - (WINDOW_HEIGHT / 2);
@@ -195,21 +215,6 @@ void Game::ProcessGameOver()
 {
     std::cout << "Game Over" << std::endl;
     isRunning = false;
-}
-
-void Game::Render()
-{
-    // Set the background color
-    SDL_SetRenderDrawColor(renderer, 21, 21, 21, 255);
-    SDL_RenderClear(renderer);
-
-    // Here we call the manager.render to render all entities
-    if(manager.HasNoEntities())
-        return;
-    manager.Render();
-
-    // Swap front and back buffers
-    SDL_RenderPresent(renderer);
 }
 
 void Game::Destroy()
